@@ -26,6 +26,6 @@ jobs:
             set -o pipefail
             cd ${{ secrets.PROJECT_PATH }}
             git pull origin main    
-            docker compose up -d --build
+            docker compose --env-file docker-compose.env up -d --build
             docker image prune -f
             echo "✅ Все контейнеры успешно запущены"
