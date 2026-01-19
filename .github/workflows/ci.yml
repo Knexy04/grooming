@@ -101,32 +101,56 @@ jobs:
     name: Deploy to server (docker compose)
     runs-on: ubuntu-latest
     needs: publish_images
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.SSH_HOST != '' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     env:
       BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-backend:latest
       FRONTEND_IMAGE: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-frontend:latest
-      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      # Fixed deploy directory on the server (no secret required)
+      DEPLOY_PATH: /opt/grooming
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Copy compose file to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
-          source: "docker-compose.prod.yml"
-          target: ${{ secrets.DEPLOY_PATH }}
+      - name: Deploy disabled (missing SSH secrets)
+        if: ${{ env.SSH_HOST == '' || env.SSH_USER == '' || env.SSH_KEY == '' }}
+        run: |
+          echo "Deploy skipped: SSH_HOST/SSH_USER/SSH_KEY not set."
 
-      - name: Deploy (pull & up)
+      - name: Ensure deploy directory exists
+        if: ${{ env.SSH_HOST != '' && env.SSH_USER != '' && env.SSH_KEY != '' }}
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          port: ${{ env.SSH_PORT || 22 }}
+          script: |
+            set -euo pipefail
+            mkdir -p "${DEPLOY_PATH}"
+
+      - name: Copy compose file to server
+        if: ${{ env.SSH_HOST != '' && env.SSH_USER != '' && env.SSH_KEY != '' }}
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          port: ${{ env.SSH_PORT || 22 }}
+          source: "docker-compose.prod.yml"
+          target: ${{ env.DEPLOY_PATH }}
+
+      - name: Deploy (pull & up)
+        if: ${{ env.SSH_HOST != '' && env.SSH_USER != '' && env.SSH_KEY != '' }}
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ${{ env.SSH_USER }}
+          key: ${{ env.SSH_KEY }}
+          port: ${{ env.SSH_PORT || 22 }}
           script: |
             set -euo pipefail
             cd "${DEPLOY_PATH}"
