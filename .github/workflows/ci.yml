@@ -50,7 +50,7 @@ jobs:
         run: docker build -t grooming-frontend:ci --build-arg VITE_API_BASE_URL=http://backend:3000 ./frontend
 
       - name: Compose config check
-        run: docker compose config
+        run: docker compose -f docker-compose.prod.yml config
 
   publish_images:
     name: Publish Docker images (GHCR)
