@@ -1,0 +1,347 @@
+.page {
+  min-height: 100vh;
+  background: radial-gradient(1000px 600px at 20% 10%, rgba(122, 132, 255, 0.25), transparent 60%),
+    radial-gradient(900px 500px at 80% 0%, rgba(255, 122, 204, 0.22), transparent 55%),
+    radial-gradient(900px 600px at 30% 90%, rgba(55, 255, 200, 0.12), transparent 60%),
+    #0b0f1a;
+  color: rgba(255, 255, 255, 0.92);
+  padding: 32px 16px;
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.topbar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.topbar-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.topbar-row-below {
+  justify-content: space-between;
+}
+
+.topbar-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.topbar-tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  /* Без темной “шапки” сверху: убрали градиент и отрицательный margin */
+  padding: env(safe-area-inset-top) 0 12px;
+  margin: 0 0 18px;
+  /* На десктопе не затемняем фон “полосой” на всю ширину */
+  background: transparent;
+}
+
+.header-inner {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 18px;
+  padding: 14px 14px 12px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.header-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.header-actions-slot {
+  display: flex;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+}
+
+.header-tabs {
+  margin-top: 12px;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.header-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header-subrow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.header-search {
+  width: 420px;
+  max-width: 70vw;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(10px);
+}
+
+.row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th,
+.table td {
+  padding: 10px 10px;
+  vertical-align: top;
+}
+
+.table thead th {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.66);
+  font-weight: 650;
+}
+
+.table tbody tr + tr td {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 20px 12px;
+  }
+
+  .header {
+    margin: 0 0 14px;
+    padding: env(safe-area-inset-top) 0 10px;
+    /* Без “чёрной полосы” на всю ширину */
+    background: transparent;
+    backdrop-filter: none;
+  }
+
+  .header-inner {
+    padding: 12px 12px 10px;
+    /* Полностью непрозрачный фон, чтобы под хедером ничего не просвечивало */
+    background: rgba(11, 15, 26, 1);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .header-title {
+    font-size: 18px;
+  }
+
+  .header-actions-slot {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .header-buttons {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .header-search {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .topbar-row {
+    align-items: stretch;
+  }
+
+  .topbar-title {
+    font-size: 18px;
+  }
+
+  .header-actions {
+    justify-content: stretch;
+    align-items: stretch;
+  }
+
+  /* header-search уже переопределен выше */
+
+  .topbar-row-below {
+    width: 100%;
+  }
+
+  /* вкладки как горизонтальный таббар */
+  .topbar-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+
+  .topbar-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .btn {
+    padding: 10px 12px;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.66);
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.22);
+  color: rgba(255, 255, 255, 0.92);
+  outline: none;
+}
+
+.textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: rgba(122, 132, 255, 0.75);
+  box-shadow: 0 0 0 4px rgba(122, 132, 255, 0.18);
+}
+
+.btn {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: transform 0.05s ease, background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, rgba(122, 132, 255, 0.95), rgba(255, 122, 204, 0.9));
+  border-color: rgba(255, 255, 255, 0.18);
+  color: rgba(12, 14, 20, 0.95);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.btn-danger {
+  background: rgba(255, 77, 109, 0.22);
+  border-color: rgba(255, 77, 109, 0.35);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.10);
+  margin: 14px 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.24);
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.muted {
+  color: rgba(255, 255, 255, 0.66);
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+

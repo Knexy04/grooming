@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install backend deps
+        working-directory: backend
+        run: npm ci
+
+      - name: Build backend
+        working-directory: backend
+        env:
+          DATABASE_URL: "postgresql://user:pass@localhost:5432/db?schema=public"
+        run: |
+          npm run prisma:generate
+          npm run build
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        env:
+          VITE_API_BASE_URL: "http://localhost:3000"
+        run: npm run build
+
+      - name: Docker build (backend)
+        run: docker build -t grooming-backend:ci ./backend
+
+      - name: Docker build (frontend)
+        run: docker build -t grooming-frontend:ci --build-arg VITE_API_BASE_URL=http://backend:3000 ./frontend
+
+      - name: Compose config check
+        run: docker compose config
+
+
