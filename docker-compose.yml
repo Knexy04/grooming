@@ -38,9 +38,7 @@ services:
     build:
       context: ./frontend
       args:
-        # Важно: это значение использует браузер на твоей машине, а не контейнер.
-        # Поэтому по умолчанию указываем localhost, а не hostname сервиса Docker.
-        VITE_API_BASE_URL: "${VITE_API_BASE_URL:-http://localhost:3000}"
+        VITE_API_BASE_URL: "${VITE_API_BASE_URL:-http://backend:3000}"
     image: grooming-frontend:local
     restart: unless-stopped
     depends_on:
