@@ -12,7 +12,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (res.status === 401) {
     localStorage.setItem('returnTo', window.location.pathname + window.location.search);
-    window.location.replace('/login');
+    window.location.replace('/admin/login');
     throw new Error('Unauthorized');
   }
 
@@ -30,6 +30,28 @@ export async function apiLogin(email: string, password: string) {
   return await request<LoginResponse>('/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
+  });
+}
+
+export type DistributorLoginResponse = {
+  distributor: {
+    id: string;
+    fullName: string;
+    phone: string;
+    note: string | null;
+    createdAt: string;
+  };
+  stats: {
+    activeBatches: number;
+    activations: number;
+    payout: number;
+  };
+};
+
+export async function apiDistributorLogin(phone: string) {
+  return await request<DistributorLoginResponse>('/auth/distributor-login', {
+    method: 'POST',
+    body: JSON.stringify({ phone }),
   });
 }
 
@@ -112,6 +134,12 @@ export async function apiGetCampaign(id: string) {
   return await request(`/campaigns/${encodeURIComponent(id)}`);
 }
 
+export async function apiDeleteCampaign(id: string) {
+  return await request<{ ok: boolean }>(`/campaigns/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+  });
+}
+
 export async function apiCreateLeaflets(campaignId: string, body: { count: number; note?: string }) {
   return await request(`/campaigns/${encodeURIComponent(campaignId)}/leaflets`, {
     method: 'POST',
@@ -186,6 +214,52 @@ export async function apiDashboardActivations(take = 100) {
       activatedBy: { id: string; email: string };
     }>
   >(`/dashboard/activations?take=${encodeURIComponent(String(take))}`);
+}
+
+export async function apiDistributorOverview(distributorId: string) {
+  return await request<{
+    me: {
+      id: string;
+      fullName: string;
+      phone: string;
+      note: string | null;
+      createdAt: string;
+      activeBatches: number;
+      activations: number;
+      payout: number;
+    };
+    peers: Array<{
+      id: string;
+      fullName: string;
+      phone: string | null;
+      note: string | null;
+      createdAt: string;
+      activeBatches: number;
+      activations: number;
+      payout: number;
+    }>;
+  }>(`/public-dashboard/overview?distributorId=${encodeURIComponent(distributorId)}`);
+}
+
+export async function apiDistributorBatches(distributorId: string) {
+  return await request<
+    Array<{
+      id: string;
+      assignedAt: string;
+      unassignedAt: string | null;
+      rewardPerClient: number;
+      note: string | null;
+      leaflet: {
+        id: string;
+        publicCode: string;
+        printCount: number;
+        status: string;
+        campaign: { id: string; name: string };
+      };
+      activations: number;
+      payout: number;
+    }>
+  >(`/public-dashboard/batches?distributorId=${encodeURIComponent(distributorId)}`);
 }
 
 

@@ -56,6 +56,13 @@ let CampaignsService = class CampaignsService {
             throw new common_1.NotFoundException('Campaign not found');
         return campaign;
     }
+    async delete(id) {
+        const campaign = await this.prisma.campaign.findUnique({ where: { id } });
+        if (!campaign)
+            throw new common_1.NotFoundException('Campaign not found');
+        await this.prisma.campaign.delete({ where: { id } });
+        return { ok: true };
+    }
     async createLeaflet(campaignId, input) {
         const campaign = await this.prisma.campaign.findUnique({
             where: { id: campaignId },

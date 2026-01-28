@@ -50,6 +50,17 @@ export class CampaignsService {
     return campaign;
   }
 
+  async delete(id: string) {
+    // проверим, что такая компания существует, чтобы вернуть 404, а не молча "успех"
+    const campaign = await this.prisma.campaign.findUnique({ where: { id } });
+    if (!campaign) throw new NotFoundException('Campaign not found');
+
+    // Благодаря onDelete: Cascade на связях Leaflet/LeafletAssignment/Activation
+    // удаление компании потянет за собой все пачки, назначения и активации.
+    await this.prisma.campaign.delete({ where: { id } });
+    return { ok: true };
+  }
+
   async createLeaflet(
     campaignId: string,
     input: { note?: string; printCount?: number },

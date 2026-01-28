@@ -7,6 +7,7 @@ import {
   apiDashboardCampaigns,
   apiDashboardDistributors,
   apiDashboardSummary,
+  apiDeleteCampaign,
   apiGetCampaign,
   apiListCampaigns,
 } from '../lib/api';
@@ -35,7 +36,7 @@ export function DashboardPage() {
   const [leafletNote, setLeafletNote] = useState('');
   const [leafletCount, setLeafletCount] = useState('1');
 
-  const title = useMemo(() => 'Кампании', []);
+  const title = useMemo(() => 'Компании', []);
 
   async function load() {
     const list = await apiListCampaigns();
@@ -87,6 +88,20 @@ export function DashboardPage() {
     setLeafletNote('');
     setLeafletCount('1');
     await loadSelected(selectedId);
+    await loadDashboard();
+  }
+
+  async function deleteSelectedCampaign() {
+    if (!selectedId || !selected) return;
+    const ok = window.confirm(
+      `Удалить компанию "${selected.name}" вместе со всеми её пачками и активациями? Это действие нельзя отменить.`,
+    );
+    if (!ok) return;
+
+    await apiDeleteCampaign(selectedId);
+    setSelectedId(null);
+    setSelected(null);
+    await load();
     await loadDashboard();
   }
 
@@ -153,7 +168,7 @@ export function DashboardPage() {
                 Сводка
               </Button>
               <Button variant={tab === 'campaigns' ? 'primary' : 'secondary'} onClick={() => setTab('campaigns')}>
-                Кампании
+                Компании
               </Button>
               <Button variant={tab === 'batches' ? 'primary' : 'secondary'} onClick={() => setTab('batches')}>
                 Пачки
@@ -187,7 +202,7 @@ export function DashboardPage() {
                 <div className="muted">Загрузка…</div>
               ) : (
                 <div className="row">
-                  <Badge>Кампаний: {summary.campaigns}</Badge>
+                  <Badge>Компаний: {summary.campaigns}</Badge>
                   <Badge>Пачек: {summary.batches}</Badge>
                   <Badge>Клиентов: {summary.activations}</Badge>
                   <Badge>Начислено: {summary.totalPayout} ₽</Badge>
@@ -230,7 +245,7 @@ export function DashboardPage() {
 
       {tab === 'campaigns' ? (
         <Card>
-          <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 10 }}>Кампании (таблица)</div>
+          <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 10 }}>Компании (таблица)</div>
           <div style={{ overflowX: 'auto' }}>
             <table className="table">
               <thead>
@@ -270,7 +285,7 @@ export function DashboardPage() {
               <thead>
                 <tr style={{ textAlign: 'left' }}>
                   <th>Код</th>
-                  <th>Кампания</th>
+                  <th>Компания</th>
                   <th>Размер</th>
                   <th>Клиентов</th>
                   <th>Раздает</th>
@@ -353,7 +368,7 @@ export function DashboardPage() {
                 <tr style={{ textAlign: 'left' }}>
                   <th>Когда</th>
                   <th>Пачка</th>
-                  <th>Кампания</th>
+                  <th>Компания</th>
                   <th>Раздатчик</th>
                   <th>Начисление</th>
                   <th>Примечание</th>
@@ -445,9 +460,18 @@ export function DashboardPage() {
                     </div>
                     {selected.note ? <div className="muted" style={{ marginTop: 8 }}>{selected.note}</div> : null}
 
+                    <div className="row" style={{ marginTop: 8, alignItems: 'center', gap: 10 }}>
+                      <Button variant="danger" onClick={() => void deleteSelectedCampaign()}>
+                        Удалить компанию целиком
+                      </Button>
+                      <div className="muted" style={{ fontSize: 12 }}>
+                        Будут удалены все пачки и активации, связанные с этой компанией.
+                      </div>
+                    </div>
+
                     <Divider />
 
-                    <div style={{ fontWeight: 700, marginBottom: 10 }}>Создать пачку листовок в кампании</div>
+                    <div style={{ fontWeight: 700, marginBottom: 10 }}>Создать пачку листовок в компании</div>
                     <div className="row" style={{ alignItems: 'flex-end' }}>
                       <div style={{ width: 160 }}>
                         <Input

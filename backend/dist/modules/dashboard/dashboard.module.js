@@ -17,7 +17,7 @@ exports.DashboardModule = DashboardModule;
 exports.DashboardModule = DashboardModule = __decorate([
     (0, common_1.Module)({
         imports: [auth_module_1.AuthModule],
-        controllers: [dashboard_controller_1.DashboardController],
+        controllers: [dashboard_controller_1.DashboardController, dashboard_controller_1.PublicDistributorDashboardController],
         providers: [dashboard_service_1.DashboardService],
     })
 ], DashboardModule);

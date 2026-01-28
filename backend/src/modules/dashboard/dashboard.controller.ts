@@ -34,4 +34,22 @@ export class DashboardController {
   }
 }
 
+// Публичные дашборды для раздатчиков (без авторизации по JWT)
+@Controller('public-dashboard')
+export class PublicDistributorDashboardController {
+  constructor(private readonly dashboard: DashboardService) {}
+
+  @Get('overview')
+  async overview(@Query('distributorId') distributorId?: string) {
+    if (!distributorId) return null;
+    return await this.dashboard.distributorOverview(distributorId);
+  }
+
+  @Get('batches')
+  async batches(@Query('distributorId') distributorId?: string) {
+    if (!distributorId) return [];
+    return await this.dashboard.distributorBatches(distributorId);
+  }
+}
+
 

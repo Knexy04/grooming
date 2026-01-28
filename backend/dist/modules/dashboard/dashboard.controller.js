@@ -12,7 +12,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DashboardController = void 0;
+exports.PublicDistributorDashboardController = exports.DashboardController = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_guard_1 = require("../auth/jwt.guard");
 const dashboard_service_1 = require("./dashboard.service");
@@ -75,4 +75,38 @@ exports.DashboardController = DashboardController = __decorate([
     (0, common_1.Controller)('dashboard'),
     __metadata("design:paramtypes", [dashboard_service_1.DashboardService])
 ], DashboardController);
+let PublicDistributorDashboardController = class PublicDistributorDashboardController {
+    constructor(dashboard) {
+        this.dashboard = dashboard;
+    }
+    async overview(distributorId) {
+        if (!distributorId)
+            return null;
+        return await this.dashboard.distributorOverview(distributorId);
+    }
+    async batches(distributorId) {
+        if (!distributorId)
+            return [];
+        return await this.dashboard.distributorBatches(distributorId);
+    }
+};
+exports.PublicDistributorDashboardController = PublicDistributorDashboardController;
+__decorate([
+    (0, common_1.Get)('overview'),
+    __param(0, (0, common_1.Query)('distributorId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PublicDistributorDashboardController.prototype, "overview", null);
+__decorate([
+    (0, common_1.Get)('batches'),
+    __param(0, (0, common_1.Query)('distributorId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PublicDistributorDashboardController.prototype, "batches", null);
+exports.PublicDistributorDashboardController = PublicDistributorDashboardController = __decorate([
+    (0, common_1.Controller)('public-dashboard'),
+    __metadata("design:paramtypes", [dashboard_service_1.DashboardService])
+], PublicDistributorDashboardController);
 //# sourceMappingURL=dashboard.controller.js.map

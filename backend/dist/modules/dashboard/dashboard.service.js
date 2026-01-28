@@ -153,6 +153,106 @@ let DashboardService = class DashboardService {
             activatedBy: a.activatedBy,
         }));
     }
+    async distributorOverview(distributorId) {
+        const distributor = await this.prisma.distributor.findUnique({
+            where: { id: distributorId },
+            include: {
+                assignments: {
+                    include: {
+                        activations: true,
+                    },
+                },
+            },
+        });
+        if (!distributor)
+            return null;
+        let activations = 0;
+        let payout = 0;
+        let activeBatches = 0;
+        for (const a of distributor.assignments) {
+            activations += a.activations.length;
+            payout += a.activations.length * a.rewardPerClient;
+            if (!a.unassignedAt)
+                activeBatches += 1;
+        }
+        const all = await this.prisma.distributor.findMany({
+            orderBy: { createdAt: 'desc' },
+            include: {
+                assignments: {
+                    include: {
+                        activations: true,
+                    },
+                },
+            },
+        });
+        const peers = all.map((d) => {
+            let dActivations = 0;
+            let dPayout = 0;
+            let dActiveBatches = 0;
+            for (const a of d.assignments) {
+                dActivations += a.activations.length;
+                dPayout += a.activations.length * a.rewardPerClient;
+                if (!a.unassignedAt)
+                    dActiveBatches += 1;
+            }
+            return {
+                id: d.id,
+                fullName: d.fullName,
+                phone: d.id === distributor.id ? d.phone : null,
+                note: d.note,
+                createdAt: d.createdAt,
+                activeBatches: dActiveBatches,
+                activations: dActivations,
+                payout: dPayout,
+            };
+        });
+        return {
+            me: {
+                id: distributor.id,
+                fullName: distributor.fullName,
+                phone: distributor.phone,
+                note: distributor.note,
+                createdAt: distributor.createdAt,
+                activeBatches,
+                activations,
+                payout,
+            },
+            peers,
+        };
+    }
+    async distributorBatches(distributorId) {
+        const items = await this.prisma.leafletAssignment.findMany({
+            where: { distributorId },
+            orderBy: { assignedAt: 'desc' },
+            include: {
+                leaflet: {
+                    include: {
+                        campaign: true,
+                    },
+                },
+                activations: true,
+            },
+        });
+        return items.map((a) => ({
+            id: a.id,
+            assignedAt: a.assignedAt,
+            unassignedAt: a.unassignedAt,
+            rewardPerClient: a.rewardPerClient,
+            note: a.note,
+            leaflet: {
+                id: a.leaflet.id,
+                publicCode: a.leaflet.publicCode,
+                printCount: a.leaflet.printCount,
+                status: a.leaflet.status,
+                campaign: {
+                    id: a.leaflet.campaign.id,
+                    name: a.leaflet.campaign.name,
+                },
+            },
+            activations: a.activations.length,
+            payout: a.activations.length * a.rewardPerClient,
+        }));
+    }
 };
 exports.DashboardService = DashboardService;
 exports.DashboardService = DashboardService = __decorate([

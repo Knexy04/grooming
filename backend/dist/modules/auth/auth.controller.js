@@ -24,6 +24,10 @@ let AuthController = class AuthController {
         const password = body.password ?? '';
         return await this.auth.login(email, password);
     }
+    async distributorLogin(body) {
+        const phone = (body.phone ?? '').trim();
+        return await this.auth.distributorLogin(phone);
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -33,6 +37,13 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
+__decorate([
+    (0, common_1.Post)('distributor-login'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "distributorLogin", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

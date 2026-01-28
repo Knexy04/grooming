@@ -32,6 +32,9 @@ let CampaignsController = class CampaignsController {
     async get(id) {
         return await this.campaigns.get(id);
     }
+    async delete(id) {
+        return await this.campaigns.delete(id);
+    }
     async createLeaflet(campaignId, body) {
         return await this.campaigns.createLeaflet(campaignId, {
             note: body.note,
@@ -60,6 +63,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CampaignsController.prototype, "get", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], CampaignsController.prototype, "delete", null);
 __decorate([
     (0, common_1.Post)(':id/leaflets'),
     __param(0, (0, common_1.Param)('id')),

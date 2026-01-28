@@ -5,20 +5,20 @@ export declare class CampaignsService {
     private generatePublicCode;
     list(): Promise<{
         id: string;
-        createdAt: Date;
         name: string;
         status: string;
         note: string | null;
+        createdAt: Date;
     }[]>;
     create(input: {
         name: string;
         note?: string;
     }): Promise<{
         id: string;
-        createdAt: Date;
         name: string;
         status: string;
         note: string | null;
+        createdAt: Date;
     }>;
     get(id: string): Promise<{
         leaflets: ({
@@ -28,8 +28,8 @@ export declare class CampaignsService {
             assignments: ({
                 distributor: {
                     id: string;
-                    createdAt: Date;
                     note: string | null;
+                    createdAt: Date;
                     fullName: string;
                     phone: string;
                 };
@@ -44,28 +44,31 @@ export declare class CampaignsService {
             })[];
         } & {
             id: string;
-            createdAt: Date;
             status: string;
             note: string | null;
+            createdAt: Date;
             campaignId: string;
             publicCode: string;
             printCount: number;
         })[];
     } & {
         id: string;
-        createdAt: Date;
         name: string;
         status: string;
         note: string | null;
+        createdAt: Date;
+    }>;
+    delete(id: string): Promise<{
+        ok: boolean;
     }>;
     createLeaflet(campaignId: string, input: {
         note?: string;
         printCount?: number;
     }): Promise<{
         id: string;
-        createdAt: Date;
         status: string;
         note: string | null;
+        createdAt: Date;
         campaignId: string;
         publicCode: string;
         printCount: number;

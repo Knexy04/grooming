@@ -37,29 +37,29 @@ export declare class LeafletsController {
         rewardPerClient?: number;
         note?: string;
     }): Promise<{
+        distributor: {
+            id: string;
+            createdAt: Date;
+            fullName: string;
+            phone: string;
+            note: string | null;
+        };
         leaflet: {
             id: string;
             createdAt: Date;
-            status: string;
             note: string | null;
+            status: string;
             campaignId: string;
             publicCode: string;
             printCount: number;
         };
-        distributor: {
-            id: string;
-            createdAt: Date;
-            note: string | null;
-            fullName: string;
-            phone: string;
-        };
     } & {
         id: string;
         note: string | null;
-        assignedAt: Date;
         leafletId: string;
         distributorId: string;
         rewardPerClient: number;
+        assignedAt: Date;
         unassignedAt: Date | null;
     }>;
     reassign(code: string, body: {
@@ -68,29 +68,29 @@ export declare class LeafletsController {
         rewardPerClient?: number;
         note?: string;
     }): Promise<{
+        distributor: {
+            id: string;
+            createdAt: Date;
+            fullName: string;
+            phone: string;
+            note: string | null;
+        };
         leaflet: {
             id: string;
             createdAt: Date;
-            status: string;
             note: string | null;
+            status: string;
             campaignId: string;
             publicCode: string;
             printCount: number;
         };
-        distributor: {
-            id: string;
-            createdAt: Date;
-            note: string | null;
-            fullName: string;
-            phone: string;
-        };
     } & {
         id: string;
         note: string | null;
-        assignedAt: Date;
         leafletId: string;
         distributorId: string;
         rewardPerClient: number;
+        assignedAt: Date;
         unassignedAt: Date | null;
     }>;
     activate(code: string, body: {

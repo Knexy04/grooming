@@ -6,8 +6,8 @@ export declare class CampaignsController {
         id: string;
         createdAt: Date;
         name: string;
-        status: string;
         note: string | null;
+        status: string;
     }[]>;
     create(body: {
         name?: string;
@@ -16,36 +16,36 @@ export declare class CampaignsController {
         id: string;
         createdAt: Date;
         name: string;
-        status: string;
         note: string | null;
+        status: string;
     }>;
     get(id: string): Promise<{
         leaflets: ({
-            _count: {
-                activations: number;
-            };
             assignments: ({
                 distributor: {
                     id: string;
                     createdAt: Date;
-                    note: string | null;
                     fullName: string;
                     phone: string;
+                    note: string | null;
                 };
             } & {
                 id: string;
                 note: string | null;
-                assignedAt: Date;
                 leafletId: string;
                 distributorId: string;
                 rewardPerClient: number;
+                assignedAt: Date;
                 unassignedAt: Date | null;
             })[];
+            _count: {
+                activations: number;
+            };
         } & {
             id: string;
             createdAt: Date;
-            status: string;
             note: string | null;
+            status: string;
             campaignId: string;
             publicCode: string;
             printCount: number;
@@ -54,8 +54,11 @@ export declare class CampaignsController {
         id: string;
         createdAt: Date;
         name: string;
-        status: string;
         note: string | null;
+        status: string;
+    }>;
+    delete(id: string): Promise<{
+        ok: boolean;
     }>;
     createLeaflet(campaignId: string, body: {
         note?: string;
@@ -63,8 +66,8 @@ export declare class CampaignsController {
     }): Promise<{
         id: string;
         createdAt: Date;
-        status: string;
         note: string | null;
+        status: string;
         campaignId: string;
         publicCode: string;
         printCount: number;

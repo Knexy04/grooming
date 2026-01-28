@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   apiActivateLeafletByCode,
   apiAssignLeafletByCode,
+  apiDashboardDistributors,
   apiDownloadLeafletPdf,
   apiLeafletByCode,
   apiReassignLeafletByCode,
@@ -22,6 +23,20 @@ export function LeafletPage({ code }: { code: string }) {
 
   const [activationNote, setActivationNote] = useState('');
   const [reassignOpen, setReassignOpen] = useState(false);
+
+  const [distributors, setDistributors] = useState<any[] | null>(null);
+
+  function isValidPhone(value: string) {
+    const trimmed = value.trim();
+    const digits = value.replace(/\D/g, '');
+    return trimmed.startsWith('+7') && digits.length === 11;
+  }
+
+  function normalizePhoneLocal(value: string) {
+    // для сравнения берём последние 10 цифр
+    const digits = value.replace(/\D/g, '');
+    return digits.slice(-10);
+  }
 
   const title = useMemo(() => (code ? `Пачка ${code}` : 'Пачка'), [code]);
 
@@ -49,9 +64,31 @@ export function LeafletPage({ code }: { code: string }) {
     void load();
   }, [code]);
 
+  // Подтягиваем список всех раздатчиков, чтобы подсказывать совпадения по номеру
+  useEffect(() => {
+    void (async () => {
+      try {
+        const list = await apiDashboardDistributors();
+        setDistributors(list);
+      } catch {
+        // не критично для основного сценария, просто не будут подсказки
+      }
+    })();
+  }, []);
+
+  const matchedDistributor = useMemo(() => {
+    const phoneNorm = normalizePhoneLocal(phone);
+    if (!phoneNorm || !distributors) return null;
+    return distributors.find((d) => normalizePhoneLocal(d.phone) === phoneNorm) ?? null;
+  }, [phone, distributors]);
+
   async function doAssign(mode: 'assign' | 'reassign') {
     setError(null);
     try {
+      if (!isValidPhone(phone)) {
+        setError('Номер телефона должен начинаться с +7 и содержать 11 цифр.');
+        return;
+      }
       const payload = {
         fullName,
         phone,
@@ -105,7 +142,8 @@ export function LeafletPage({ code }: { code: string }) {
             <Button
               variant="secondary"
               onClick={() => {
-                window.location.assign('/');
+                // Для админа "главная" — админский дашборд
+                window.location.assign('/admin');
               }}
             >
               На главную
@@ -136,7 +174,7 @@ export function LeafletPage({ code }: { code: string }) {
           <>
             <div className="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-                <Badge>Кампания: {data.campaign.name}</Badge>
+                <Badge>Компания: {data.campaign.name}</Badge>
                 <Badge>
                   Код: <span className="mono">{data.leaflet.publicCode}</span>
                 </Badge>
@@ -157,12 +195,45 @@ export function LeafletPage({ code }: { code: string }) {
                     <Input label="ФИО" value={fullName} onChange={setFullName} placeholder="Иванов Иван" />
                   </div>
                   <div style={{ flex: '1 1 200px' }}>
-                    <Input label="Телефон" value={phone} onChange={setPhone} placeholder="+7..." />
+                    <Input
+                      label="Телефон"
+                      value={phone}
+                      onChange={setPhone}
+                      placeholder="+7 999 123-45-67"
+                    />
                   </div>
                   <div style={{ width: 160 }}>
                     <Input label="Вознаграждение (₽)" value={reward} onChange={setReward} placeholder="200" />
                   </div>
                 </div>
+                {normalizePhoneLocal(phone) ? (
+                  matchedDistributor ? (
+                    <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>
+                      Уже есть раздатчик с этим номером:{' '}
+                      <span style={{ fontWeight: 600 }}>{matchedDistributor.fullName}</span>.{' '}
+                      <button
+                        type="button"
+                        style={{
+                          border: 'none',
+                          padding: 0,
+                          margin: 0,
+                          background: 'none',
+                          color: 'var(--accent-color, #3b82f6)',
+                          cursor: 'pointer',
+                          textDecoration: 'underline',
+                          fontSize: 13,
+                        }}
+                        onClick={() => setFullName(matchedDistributor.fullName)}
+                      >
+                        Подставить ФИО
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>
+                      Такого номера ещё нет — будет создан новый раздатчик.
+                    </div>
+                  )
+                ) : null}
                 <Textarea
                   label="Примечание"
                   value={assignNote}
@@ -207,12 +278,45 @@ export function LeafletPage({ code }: { code: string }) {
                         <Input label="ФИО" value={fullName} onChange={setFullName} placeholder="Иванов Иван" />
                       </div>
                       <div style={{ flex: '1 1 200px' }}>
-                        <Input label="Телефон" value={phone} onChange={setPhone} placeholder="+7..." />
+                        <Input
+                          label="Телефон"
+                          value={phone}
+                          onChange={setPhone}
+                          placeholder="+7 999 123-45-67"
+                        />
                       </div>
                       <div style={{ width: 160 }}>
                         <Input label="Вознаграждение (₽)" value={reward} onChange={setReward} placeholder="200" />
                       </div>
                     </div>
+                    {normalizePhoneLocal(phone) ? (
+                      matchedDistributor ? (
+                        <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>
+                          Уже есть раздатчик с этим номером:{' '}
+                          <span style={{ fontWeight: 600 }}>{matchedDistributor.fullName}</span>.{' '}
+                          <button
+                            type="button"
+                            style={{
+                              border: 'none',
+                              padding: 0,
+                              margin: 0,
+                              background: 'none',
+                              color: 'var(--accent-color, #3b82f6)',
+                              cursor: 'pointer',
+                              textDecoration: 'underline',
+                              fontSize: 13,
+                            }}
+                            onClick={() => setFullName(matchedDistributor.fullName)}
+                          >
+                            Подставить ФИО
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>
+                          Такого номера ещё нет — будет создан новый раздатчик.
+                        </div>
+                      )
+                    ) : null}
                     <Textarea
                       label="Примечание"
                       value={assignNote}

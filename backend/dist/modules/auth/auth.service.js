@@ -20,6 +20,21 @@ let AuthService = class AuthService {
         this.prisma = prisma;
         this.jwt = jwt;
     }
+    normalizePhone(phone) {
+        const digits = (phone ?? '').replace(/[^\d]/g, '');
+        if (!digits)
+            return '';
+        if (digits.length === 11 && digits.startsWith('8')) {
+            return '+7' + digits.slice(1);
+        }
+        if (digits.length === 11 && digits.startsWith('7')) {
+            return '+7' + digits.slice(1);
+        }
+        if (digits.length === 10) {
+            return '+7' + digits;
+        }
+        return digits.startsWith('+') ? digits : '+' + digits;
+    }
     async ensureDefaultAdmin() {
         const count = await this.prisma.user.count();
         if (count > 0)
@@ -48,6 +63,42 @@ let AuthService = class AuthService {
     }
     async verifyToken(token) {
         return await this.jwt.verifyAsync(token, { secret: config_1.CONFIG.jwtSecret });
+    }
+    async distributorLogin(rawPhone) {
+        const phone = this.normalizePhone(rawPhone ?? '');
+        if (!phone) {
+            throw new common_1.UnauthorizedException('Укажи номер телефона');
+        }
+        const distributor = await this.prisma.distributor.findFirst({
+            where: { phone },
+            include: { assignments: { include: { activations: true } } },
+        });
+        if (!distributor) {
+            throw new common_1.UnauthorizedException('Раздатчик с таким номером не найден');
+        }
+        let activations = 0;
+        let payout = 0;
+        let activeBatches = 0;
+        for (const a of distributor.assignments) {
+            activations += a.activations.length;
+            payout += a.activations.length * a.rewardPerClient;
+            if (!a.unassignedAt)
+                activeBatches += 1;
+        }
+        return {
+            distributor: {
+                id: distributor.id,
+                fullName: distributor.fullName,
+                phone: distributor.phone,
+                note: distributor.note,
+                createdAt: distributor.createdAt,
+            },
+            stats: {
+                activeBatches,
+                activations,
+                payout,
+            },
+        };
     }
 };
 exports.AuthService = AuthService;

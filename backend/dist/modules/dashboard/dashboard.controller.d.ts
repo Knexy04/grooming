@@ -70,3 +70,48 @@ export declare class DashboardController {
         };
     }[]>;
 }
+export declare class PublicDistributorDashboardController {
+    private readonly dashboard;
+    constructor(dashboard: DashboardService);
+    overview(distributorId?: string): Promise<{
+        me: {
+            id: string;
+            fullName: string;
+            phone: string;
+            note: string;
+            createdAt: Date;
+            activeBatches: number;
+            activations: number;
+            payout: number;
+        };
+        peers: {
+            id: string;
+            fullName: string;
+            phone: string;
+            note: string;
+            createdAt: Date;
+            activeBatches: number;
+            activations: number;
+            payout: number;
+        }[];
+    }>;
+    batches(distributorId?: string): Promise<{
+        id: string;
+        assignedAt: Date;
+        unassignedAt: Date;
+        rewardPerClient: number;
+        note: string;
+        leaflet: {
+            id: string;
+            publicCode: string;
+            printCount: number;
+            status: string;
+            campaign: {
+                id: string;
+                name: string;
+            };
+        };
+        activations: number;
+        payout: number;
+    }[]>;
+}

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { JwtGuard } from '../auth/jwt.guard';
 import { CampaignsService } from './campaigns.service';
 
@@ -23,6 +23,11 @@ export class CampaignsController {
   @Get(':id')
   async get(@Param('id') id: string) {
     return await this.campaigns.get(id);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return await this.campaigns.delete(id);
   }
 
   @Post(':id/leaflets')

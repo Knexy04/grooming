@@ -11,6 +11,12 @@ export class AuthController {
     const password = body.password ?? '';
     return await this.auth.login(email, password);
   }
+
+  @Post('distributor-login')
+  async distributorLogin(@Body() body: { phone?: string }) {
+    const phone = (body.phone ?? '').trim();
+    return await this.auth.distributorLogin(phone);
+  }
 }
 
 
